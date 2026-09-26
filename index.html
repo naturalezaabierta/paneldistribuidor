@@ -15,6 +15,8 @@
     --ink:#20241c; --texto:#23291f; --texto-suave:#6b7364;
     --cream:#faf7f0; --superficie:#ffffff; --linea:#e7e0d0;
     --rojo:#a9594a; --rojo-soft:#f8e8e4;
+    --input-bg:#fdfcf9; --input-text:#23291f; --panel-muted:#f7f5ef;
+    --shadow:0 10px 30px rgba(30,40,20,.07);
     box-sizing:border-box;
   }
   *{box-sizing:border-box;}
@@ -45,10 +47,48 @@
   .tabs-acceso button.activo{background:var(--forest); color:#fff;}
   label{display:block; font-size:12px; font-weight:600; color:#4a5a4a; margin:12px 0 5px;}
   input[type=text], input[type=email], input[type=password], input[type=number]{
-    width:100%; padding:11px 13px; border-radius:9px; border:1px solid var(--linea);
-    font-family:'Work Sans',sans-serif; font-size:15px; background:#fdfcf9;
+    width:100%; padding:11px 13px; border-radius:10px; border:1px solid var(--linea);
+    font-family:'Work Sans',sans-serif; font-size:15px; background:var(--input-bg); color:var(--input-text);
+    transition:border-color .2s, box-shadow .2s, background .2s;
   }
-  input:focus{outline:none; border-color:var(--forest);}
+  input::placeholder{color:var(--texto-suave); opacity:.85;}
+  input:focus{outline:none; border-color:var(--forest); box-shadow:0 0 0 3px rgba(47,107,58,.12);}
+  select{background:var(--input-bg); color:var(--input-text); border:1px solid var(--linea); border-radius:10px; padding:10px 12px; font:600 13px 'Work Sans',sans-serif;}
+  select:focus{outline:none; border-color:var(--forest);}
+  .theme-toggle{border:1px solid #ffffff30; background:#ffffff16; color:#fff; width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; flex-shrink:0;}
+  .theme-toggle:hover{background:#ffffff25;}
+  .header-actions{display:flex; align-items:center; gap:8px;}
+  .estado-online{display:inline-flex; align-items:center; gap:6px; font-size:10.5px; opacity:.82; margin-top:3px;}
+  .estado-online i{width:7px;height:7px;border-radius:50%;background:#74d58a;box-shadow:0 0 0 3px #74d58a22;}
+  .panel-intro{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:18px;}
+  .panel-intro h1{font-size:27px; color:var(--forest-deep); margin-bottom:4px;}
+  .panel-intro p{margin:0; color:var(--texto-suave); font-size:13px; line-height:1.5;}
+  .fecha-panel{font-size:11px;color:var(--texto-suave);white-space:nowrap;}
+  .inventario-toolbar{display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:12px;}
+  .inventario-search{flex:1; min-width:200px; position:relative;}
+  .inventario-search input{padding-left:36px;}
+  .inventario-search span{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--texto-suave);pointer-events:none;}
+  .filtros-stock{display:flex;gap:6px;}
+  .filtro-stock{border:1px solid var(--linea);background:var(--superficie);color:var(--texto-suave);border-radius:999px;padding:8px 11px;font:600 11.5px 'Work Sans',sans-serif;cursor:pointer;}
+  .filtro-stock.activo{background:var(--forest);border-color:var(--forest);color:#fff;}
+  .inventario-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .meta-pill{background:var(--panel-muted);border:1px solid var(--linea);color:var(--texto-suave);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:600;}
+  .meta-pill strong{color:var(--texto);}
+  .producto-card{box-shadow:var(--shadow); transition:transform .18s, box-shadow .18s, border-color .18s; overflow:hidden;}
+  .producto-card:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(30,40,20,.10);}
+  .producto-card.is-open{border-color:rgba(47,107,58,.35);}
+  .producto-resumen{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+  .producto-chevron{margin-left:auto;width:30px;height:30px;border:1px solid var(--linea);background:var(--panel-muted);color:var(--texto-suave);border-radius:9px;display:flex;align-items:center;justify-content:center;transition:transform .2s;}
+  .producto-card.is-open .producto-chevron{transform:rotate(180deg);}
+  .producto-body{display:none;padding-top:13px;border-top:1px solid var(--linea);margin-top:12px;}
+  .producto-card.is-open .producto-body{display:block;animation:acordeonIn .18s ease;}
+  @keyframes acordeonIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .producto-acciones{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .stock-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+  .stock-dot.bueno{background:#3b9a50}.stock-dot.medio{background:#c58d2d}.stock-dot.bajo{background:#b44d3d}
+  .toast-panel{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:100;min-width:min(90vw,360px);padding:12px 16px;border-radius:13px;background:var(--ink);color:#fff;box-shadow:0 16px 40px rgba(0,0,0,.2);font-size:13px;text-align:center;transition:.25s;}
+  .toast-panel.visible{opacity:1;transform:translate(-50%,0);}
+  .toast-panel.ok{background:var(--forest)} .toast-panel.error{background:#8e382d}
   .btn-principal{
     width:100%; margin-top:18px; padding:12px; border:none; border-radius:999px;
     background:var(--forest); color:#fff; font-weight:600; font-size:14.5px; cursor:pointer;
@@ -222,13 +262,25 @@
     .tabla-referidos td[data-etq]::before{content:attr(data-etq); display:inline-block; min-width:82px; font-size:11px; color:var(--texto-suave); font-weight:600;}
   }
 
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --cream:#12160f; --superficie:#1a2016; --linea:#2a3125; --texto:#eef1ee; --texto-suave:#9aa48f;
-      --forest-soft:#1c2c1c; --gold-soft:#2c250f; --rojo-soft:#301c18;
-    }
-    .precio-input-wrap{background:#161c12;}
+  :root[data-theme="dark"]{
+    --cream:#0d120e; --superficie:#171d17; --linea:#2b352b; --texto:#edf2ed; --texto-suave:#a5afa2;
+    --forest-soft:#1b3020; --gold-soft:#302714; --rojo-soft:#351e1a; --input-bg:#111711; --input-text:#f0f4ef; --panel-muted:#121912;
+    --ink:#0e150f; --shadow:0 12px 32px rgba(0,0,0,.20);
   }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]):not([data-theme="dark"]){
+      --cream:#0d120e; --superficie:#171d17; --linea:#2b352b; --texto:#edf2ed; --texto-suave:#a5afa2;
+      --forest-soft:#1b3020; --gold-soft:#302714; --rojo-soft:#351e1a; --input-bg:#111711; --input-text:#f0f4ef; --panel-muted:#121912;
+      --ink:#0e150f; --shadow:0 12px 32px rgba(0,0,0,.20);
+    }
+  }
+  :root[data-theme="dark"] .acceso-wrap{background:radial-gradient(circle at 20% 15%, #1b241b 0%, var(--cream) 55%);}
+  :root[data-theme="dark"] .btn-secundario{background:var(--superficie);color:var(--texto);}
+  :root[data-theme="dark"] .producto-card{background:var(--superficie);}
+  :root[data-theme="dark"] .tabla-referidos td{border-bottom-color:#242c24;}
+  :root[data-theme="dark"] .navtabs{background:var(--superficie);}
+  :root[data-theme="dark"] .navtabs button{background:var(--superficie);}
+  :root[data-theme="dark"] .precio-input-wrap{background:#111711;}
 </style>
 </head>
 <body>
@@ -289,8 +341,12 @@
       <div class="rotulo">Distribuidor</div>
       <div class="nombre" id="nombreDistribuidor">—</div>
       <div class="codigo" id="codigoDistribuidor">—</div>
+      <div class="estado-online"><i></i> Panel conectado</div>
     </div>
-    <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+    <div class="header-actions">
+      <button class="theme-toggle" id="btnTema" onclick="alternarTema()" aria-label="Cambiar tema">☾</button>
+      <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+    </div>
   </header>
 
   <nav class="navtabs" id="navtabsMovil">
@@ -334,7 +390,15 @@
 
       <section class="seccion" id="seccion-inventario">
         <h2 class="seccion-titulo">📦 Mi inventario</h2>
-        <p class="seccion-sub">Ajusta tu precio de reventa, registra una venta o suma stock — todo desde aquí, sin ventanas emergentes.</p>
+        <p class="seccion-sub">Toca un producto para abrir sus acciones. Así mantienes el panel limpio y encuentras rápido lo que necesitas.</p>
+        <div class="inventario-toolbar">
+          <div class="inventario-search"><span>⌕</span><input id="buscarInventario" type="text" placeholder="Buscar producto…" oninput="filtrarInventario()"></div>
+          <div class="filtros-stock">
+            <button class="filtro-stock activo" data-stock-filter="todos" onclick="setFiltroStock('todos')">Todos</button>
+            <button class="filtro-stock" data-stock-filter="bajo" onclick="setFiltroStock('bajo')">Bajo stock</button>
+          </div>
+        </div>
+        <div class="inventario-meta" id="inventarioMeta"></div>
         <div class="productos-grid" id="listaInventario">
           <div class="sin-datos">Cargando…</div>
         </div>
@@ -397,6 +461,51 @@ let chartVentas = null;
 let chartReferidos = null;
 let anuncioActual = 0;
 let anuncioTimer = null;
+let filtroStockActual = 'todos';
+let inventarioCache = [];
+
+function aplicarTema(tema){
+  document.documentElement.setAttribute('data-theme', tema);
+  localStorage.setItem('na_panel_tema', tema);
+  const b=document.getElementById('btnTema');
+  if(b) b.textContent = tema==='dark' ? '☀' : '☾';
+}
+function alternarTema(){
+  const actual=document.documentElement.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+  aplicarTema(actual==='dark'?'light':'dark');
+}
+(function iniciarTema(){
+  const guardado=localStorage.getItem('na_panel_tema');
+  aplicarTema(guardado || (window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+})();
+
+function toggleProducto(id){
+  const card=document.querySelector(`.producto-card[data-id="${id}"]`);
+  if(card) card.classList.toggle('is-open');
+}
+function filtrarInventario(){
+  const q=(document.getElementById('buscarInventario')?.value||'').trim().toLowerCase();
+  document.querySelectorAll('#listaInventario .producto-card').forEach(card=>{
+    const nombre=card.dataset.productoNombre||'';
+    const stock=card.dataset.stock||'';
+    const visible=(!q || nombre.includes(q)) && (filtroStockActual==='todos' || stock==='bajo');
+    card.style.display=visible?'':'none';
+  });
+}
+function setFiltroStock(filtro){
+  filtroStockActual=filtro;
+  document.querySelectorAll('[data-stock-filter]').forEach(b=>b.classList.toggle('activo',b.dataset.stockFilter===filtro));
+  filtrarInventario();
+}
+function actualizarMetaInventario(data){
+  const meta=document.getElementById('inventarioMeta'); if(!meta) return;
+  const unidades=data.reduce((s,r)=>s+(Number(r.cantidad_disponible)||0),0);
+  const bajos=data.filter(r=>claseStock(Number(r.cantidad_disponible)||0)==='bajo').length;
+  meta.innerHTML=`<span class="meta-pill">Productos <strong>${data.length}</strong></span><span class="meta-pill">Unidades <strong>${unidades}</strong></span><span class="meta-pill">Bajo stock <strong>${bajos}</strong></span>`;
+}
+
+function actualizarFechaPanel(){ const el=document.getElementById('fechaPanel'); if(el) el.textContent=new Intl.DateTimeFormat('es-VE',{weekday:'short',day:'2-digit',month:'short'}).format(new Date()); }
+actualizarFechaPanel();
 
 function mostrarMensaje(elId, texto, tipo){
   const el = document.getElementById(elId);
@@ -531,44 +640,51 @@ async function cargarInventario(){
     return;
   }
 
+  inventarioCache = data;
+  actualizarMetaInventario(data);
   cont.innerHTML = data.map(fila => {
     const nombre = fila.productos_servicios ? fila.productos_servicios.nombre : fila.producto_id;
     const nombreEsc = nombre.replace(/'/g,"\\'");
     const precio = fila.precio_venta_propio != null ? Number(fila.precio_venta_propio).toFixed(2) : '';
     const id = fila.producto_id;
     return `
-    <div class="producto-card">
-      <div class="producto-card-top">
-        <div class="producto-nombre">${nombre}</div>
-        <span class="badge-stock ${claseStock(fila.cantidad_disponible)}">${fila.cantidad_disponible} uds disponibles</span>
-      </div>
-
-      <div class="fila-mini">
-        <label>Tu precio</label>
-        <div class="precio-input-wrap">
-          <span>$</span>
-          <input type="number" step="0.01" min="0" id="precio_${id}" value="${precio}" placeholder="0.00">
-          <button class="btn-chip" onclick="guardarPrecio('${id}')">Guardar</button>
+    <div class="producto-card" data-id="${id}" data-producto-nombre="${nombre.toLowerCase().replace(/"/g,'&quot;')}" data-stock="${claseStock(fila.cantidad_disponible)}">
+      <div class="producto-resumen" onclick="toggleProducto('${id}')">
+        <div class="producto-card-top" style="flex:1;margin:0">
+          <div class="producto-nombre"><span class="stock-dot ${claseStock(fila.cantidad_disponible)}"></span>${nombre}</div>
+          <span class="badge-stock ${claseStock(fila.cantidad_disponible)}">${fila.cantidad_disponible} uds disponibles</span>
         </div>
+        <span class="producto-chevron">⌄</span>
       </div>
-
-      <div class="fila-mini">
-        <label>Vendí</label>
-        <div class="stepper">
-          <button type="button" onclick="cambiarCantidad('${id}',-1)">–</button>
-          <input type="number" min="1" value="1" id="cant_${id}">
-          <button type="button" onclick="cambiarCantidad('${id}',1)">+</button>
+      <div class="producto-body" id="body_${id}">
+        <div class="fila-mini">
+          <label>Tu precio</label>
+          <div class="precio-input-wrap">
+            <span>$</span>
+            <input type="number" step="0.01" min="0" id="precio_${id}" value="${precio}" placeholder="0.00">
+            <button class="btn-chip" onclick="guardarPrecio('${id}')">Guardar</button>
+          </div>
         </div>
-        <button class="btn-chip venta" onclick="marcarVenta('${id}', '${nombreEsc}')">Registrar venta</button>
-      </div>
-
-      <button class="btn-link" type="button" onclick="toggleReabasto('${id}')">+ Reabastecer stock</button>
-      <div class="reabasto-inline oculto" id="wrapReab_${id}">
-        <input type="number" min="1" placeholder="Unidades" id="reab_${id}">
-        <button class="btn-chip" onclick="reabastecer('${id}', '${nombreEsc}')">Confirmar</button>
+        <div class="fila-mini">
+          <label>Vendí</label>
+          <div class="stepper">
+            <button type="button" onclick="cambiarCantidad('${id}',-1)">–</button>
+            <input type="number" min="1" value="1" id="cant_${id}">
+            <button type="button" onclick="cambiarCantidad('${id}',1)">+</button>
+          </div>
+          <button class="btn-chip venta" onclick="marcarVenta('${id}', '${nombreEsc}')">Registrar venta</button>
+        </div>
+        <div class="producto-acciones">
+          <button class="btn-link" type="button" onclick="toggleReabasto('${id}')">+ Reabastecer stock</button>
+        </div>
+        <div class="reabasto-inline oculto" id="wrapReab_${id}">
+          <input type="number" min="1" placeholder="Unidades" id="reab_${id}">
+          <button class="btn-chip" onclick="reabastecer('${id}', '${nombreEsc}')">Confirmar</button>
+        </div>
       </div>
     </div>`;
   }).join('');
+  filtrarInventario();
 }
 
 function cambiarCantidad(productoId, delta){
