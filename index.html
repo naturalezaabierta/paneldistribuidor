@@ -236,6 +236,48 @@
 
   input[type=file]{display:none;}
 
+  /* ---------- Aviso de stock bajo ---------- */
+  .aviso-stock{
+    display:flex; align-items:center; gap:12px; background:var(--rojo-soft); border:1px solid #e3c3bc;
+    color:var(--rojo); border-radius:14px; padding:12px 16px; margin-bottom:18px; font-size:13.5px; font-weight:600;
+  }
+  .aviso-stock button{
+    margin-left:auto; flex-shrink:0; border:1px solid var(--rojo); background:transparent; color:var(--rojo);
+    border-radius:999px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap;
+  }
+  .aviso-stock button:hover{background:var(--rojo); color:#fff;}
+  .nav-dot{
+    display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--rojo); margin-left:6px; vertical-align:middle;
+  }
+
+  /* ---------- Próximo pago ---------- */
+  .nota-pago{font-size:11px; color:var(--texto-suave); margin-top:4px;}
+
+  /* ---------- Historial de ventas / exportar ---------- */
+  .seccion-header-acciones{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:12px;}
+  .btn-exportar{
+    border:1px solid var(--linea); background:var(--superficie); color:var(--texto); border-radius:999px;
+    padding:8px 14px; font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap;
+  }
+  .btn-exportar:hover{background:var(--panel-muted);}
+  .tabla-ventas{width:100%; border-collapse:collapse; font-size:13px;}
+  .tabla-ventas th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--texto-suave); padding:0 10px 8px; border-bottom:1px solid var(--linea);}
+  .tabla-ventas td{padding:10px 10px; border-bottom:1px solid #f0ece1; vertical-align:top;}
+  .tabla-ventas tr:last-child td{border-bottom:none;}
+  .ventas-resumen{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+  .btn-vermas{
+    display:block; margin:14px auto 0; border:1px solid var(--linea); background:var(--superficie); color:var(--forest-deep);
+    border-radius:999px; padding:9px 18px; font-size:12.5px; font-weight:700; cursor:pointer;
+  }
+  .btn-vermas:hover{background:var(--forest-soft);}
+  @media (max-width:640px){
+    .tabla-ventas thead{display:none;}
+    .tabla-ventas, .tabla-ventas tbody, .tabla-ventas tr, .tabla-ventas td{display:block; width:100%;}
+    .tabla-ventas tr{padding:10px 0; border-bottom:1px solid #f0ece1;}
+    .tabla-ventas td{padding:2px 0; border-bottom:none;}
+    .tabla-ventas td[data-etq]::before{content:attr(data-etq); display:inline-block; min-width:100px; font-size:11px; color:var(--texto-suave); font-weight:600;}
+  }
+
   /* ---------- Escritorio: layout de panel real ---------- */
   @media (min-width:960px){
     .navtabs{display:none;}
@@ -351,7 +393,8 @@
 
   <nav class="navtabs" id="navtabsMovil">
     <button data-destino="seccion-resumen" class="activo">Resumen</button>
-    <button data-destino="seccion-inventario">Inventario</button>
+    <button data-destino="seccion-inventario">Inventario <span class="nav-dot oculto" id="navDotInventarioMovil"></span></button>
+    <button data-destino="seccion-ventas">Mis ventas</button>
     <button data-destino="seccion-referidos">Mis referidos</button>
     <button data-destino="seccion-datos">Mis datos</button>
   </nav>
@@ -359,7 +402,8 @@
   <div class="layout">
     <aside class="barra-lateral" id="barraLateral">
       <button data-destino="seccion-resumen" class="activo">📊 Resumen</button>
-      <button data-destino="seccion-inventario">📦 Inventario</button>
+      <button data-destino="seccion-inventario">📦 Inventario <span class="nav-dot oculto" id="navDotInventario"></span></button>
+      <button data-destino="seccion-ventas">🧾 Mis ventas</button>
       <button data-destino="seccion-referidos">🤝 Mis referidos</button>
       <button data-destino="seccion-datos">👤 Mis datos</button>
       <div class="separador"></div>
@@ -374,8 +418,18 @@
 
       <section class="seccion" id="seccion-resumen">
         <h2 class="seccion-titulo">📊 Resumen</h2>
+
+        <div class="aviso-stock oculto" id="avisoStockBajo">
+          <span id="avisoStockBajoTexto">—</span>
+          <button onclick="irAInventarioBajoStock()">Ver productos</button>
+        </div>
+
         <div class="kpis">
-          <div class="kpi-card"><div class="valor" id="kpiSaldo">—</div><div class="etiqueta">Saldo de comisiones</div></div>
+          <div class="kpi-card">
+            <div class="valor" id="kpiSaldo">—</div>
+            <div class="etiqueta">Saldo de comisiones</div>
+            <div class="nota-pago">Los pagos se procesan entre el 1 y el 5 de cada mes.</div>
+          </div>
           <div class="kpi-card"><div class="valor" id="kpiVentasReferidas">—</div><div class="etiqueta">Ventas referidas (total)</div></div>
           <div class="kpi-card"><div class="valor" id="kpiUnidades">—</div><div class="etiqueta">Unidades vendidas (reventa)</div></div>
           <div class="kpi-card"><div class="valor" id="kpiIngresos">—</div><div class="etiqueta">Ingresos por reventa</div></div>
@@ -404,6 +458,28 @@
         </div>
       </section>
 
+      <section class="seccion" id="seccion-ventas">
+        <div class="seccion-header-acciones">
+          <div>
+            <h2 class="seccion-titulo">🧾 Mis ventas</h2>
+            <p class="seccion-sub" style="margin-top:2px;">Todo lo que has vendido de tu inventario propio.</p>
+          </div>
+          <button class="btn-exportar" onclick="exportarVentasCSV()">⬇ Exportar CSV</button>
+        </div>
+        <div class="ventas-resumen">
+          <span class="meta-pill">Ventas <strong id="ventasHistTotal">0</strong></span>
+          <span class="meta-pill">Unidades <strong id="ventasHistUnidades">0</strong></span>
+          <span class="meta-pill">Ingresos <strong id="ventasHistIngresos">$0.00</strong></span>
+        </div>
+        <div class="inventario-search" style="margin-bottom:14px;">
+          <span>⌕</span><input id="buscarVentasHist" type="text" placeholder="Buscar por producto…" oninput="filtrarVentasHistorial()">
+        </div>
+        <div class="card-blanca">
+          <div id="ventasHistContenido"><div class="sin-datos">Cargando…</div></div>
+          <button class="btn-vermas oculto" id="btnVerMasVentas" onclick="verMasVentasHistorial()">Ver más</button>
+        </div>
+      </section>
+
       <section class="seccion" id="seccion-referidos">
         <h2 class="seccion-titulo">🤝 Mis referidos</h2>
         <p class="seccion-sub">Cuando alguien compra directo a la empresa usando tu código, aparece aquí.</p>
@@ -421,8 +497,15 @@
             <div id="sinDatosChartRef" class="sin-datos oculto">Aún no tienes comisiones generadas en este período.</div>
           </div>
           <div class="card-blanca">
-            <h3 style="font-size:15px; margin-bottom:12px; color:var(--forest-deep);">Últimas compras de tus referidos</h3>
+            <div class="seccion-header-acciones" style="margin-bottom:10px;">
+              <h3 style="font-size:15px; margin:0; color:var(--forest-deep);">Últimas compras de tus referidos</h3>
+              <button class="btn-exportar" onclick="exportarReferidosCSV()">⬇ CSV</button>
+            </div>
+            <div class="inventario-search" style="margin-bottom:12px;">
+              <span>⌕</span><input id="buscarReferidos" type="text" placeholder="Buscar por cliente o producto…" oninput="filtrarReferidos()">
+            </div>
             <div id="listaReferidos"><div class="sin-datos">Cargando…</div></div>
+            <button class="btn-vermas oculto" id="btnVerMasReferidos" onclick="verMasReferidos()">Ver más</button>
           </div>
         </div>
       </section>
@@ -597,6 +680,7 @@ async function cargarPanelCompleto(){
     cargarVentasChart(),
     cargarReferidos(),
     cargarAnuncios(),
+    cargarVentasHistorial(),
   ]);
 }
 
@@ -634,14 +718,16 @@ async function cargarInventario(){
     .select('producto_id, cantidad_disponible, precio_venta_propio, productos_servicios ( nombre )')
     .order('producto_id');
 
-  if(error){ cont.innerHTML = '<div class="sin-datos">No se pudo cargar el inventario.</div>'; return; }
+  if(error){ cont.innerHTML = '<div class="sin-datos">No se pudo cargar el inventario.</div>'; evaluarAvisoStockBajo([]); return; }
   if(!data || data.length === 0){
     cont.innerHTML = '<div class="sin-datos">Todavía no tienes productos activados. Pide al equipo que te active tu primer producto.</div>';
+    evaluarAvisoStockBajo([]);
     return;
   }
 
   inventarioCache = data;
   actualizarMetaInventario(data);
+  evaluarAvisoStockBajo(data);
   cont.innerHTML = data.map(fila => {
     const nombre = fila.productos_servicios ? fila.productos_servicios.nombre : fila.producto_id;
     const nombreEsc = nombre.replace(/'/g,"\\'");
@@ -742,6 +828,128 @@ async function reabastecer(productoId, nombre){
   cargarInventario();
 }
 
+/* ---------- Aviso de stock bajo ---------- */
+function evaluarAvisoStockBajo(data){
+  const aviso = document.getElementById('avisoStockBajo');
+  const texto = document.getElementById('avisoStockBajoTexto');
+  const bajos = (data||[]).filter(r => claseStock(Number(r.cantidad_disponible)||0) === 'bajo');
+  const dots = [document.getElementById('navDotInventario'), document.getElementById('navDotInventarioMovil')];
+  if(!bajos.length){
+    aviso.classList.add('oculto');
+    dots.forEach(d => d && d.classList.add('oculto'));
+    return;
+  }
+  const nombres = bajos.slice(0,3).map(r => r.productos_servicios ? r.productos_servicios.nombre : r.producto_id);
+  const extra = bajos.length > 3 ? ` y ${bajos.length - 3} más` : '';
+  texto.textContent = `⚠ Stock bajo en: ${nombres.join(', ')}${extra}. Considera reabastecer pronto.`;
+  aviso.classList.remove('oculto');
+  dots.forEach(d => d && d.classList.remove('oculto'));
+}
+function irAInventarioBajoStock(){
+  setFiltroStock('bajo');
+  const destino = document.getElementById('seccion-inventario');
+  if(destino) destino.scrollIntoView({behavior:'smooth', block:'start'});
+  document.querySelectorAll('[data-destino]').forEach(b=>{
+    b.classList.toggle('activo', b.dataset.destino === 'seccion-inventario');
+  });
+}
+
+/* ---------- Exportar a CSV ---------- */
+function exportarCSV(nombreArchivo, encabezados, filas){
+  const escCsv = (v) => {
+    const s = (v===null||v===undefined) ? '' : String(v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const lineas = [encabezados.map(escCsv).join(',')].concat(filas.map(f => f.map(escCsv).join(',')));
+  const blob = new Blob(['\ufeff' + lineas.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nombreArchivo;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- Historial de mis ventas ---------- */
+let ventasHistCache = [];
+let ventasHistVisibles = 15;
+async function cargarVentasHistorial(){
+  const cont = document.getElementById('ventasHistContenido');
+  const { data, error } = await sb
+    .from('ventas_distribuidor')
+    .select('id, cantidad, precio_unitario, fecha_venta, productos_servicios ( nombre )')
+    .order('fecha_venta', { ascending: false })
+    .limit(300);
+
+  if(error){ cont.innerHTML = '<div class="sin-datos">No se pudo cargar tu historial de ventas.</div>'; return; }
+  ventasHistCache = data || [];
+  ventasHistVisibles = 15;
+  renderVentasHistorial();
+}
+function filtrarVentasHistorial(){
+  ventasHistVisibles = 15;
+  renderVentasHistorial();
+}
+function verMasVentasHistorial(){
+  ventasHistVisibles += 15;
+  renderVentasHistorial();
+}
+function renderVentasHistorial(){
+  const cont = document.getElementById('ventasHistContenido');
+  const btnMas = document.getElementById('btnVerMasVentas');
+  const q = (document.getElementById('buscarVentasHist')?.value||'').trim().toLowerCase();
+
+  const filtradas = ventasHistCache.filter(v => {
+    const nombre = v.productos_servicios ? v.productos_servicios.nombre : (v.producto_id||'');
+    return !q || nombre.toLowerCase().includes(q);
+  });
+
+  const totalUnidades = filtradas.reduce((s,v)=> s + (Number(v.cantidad)||0), 0);
+  const totalIngresos = filtradas.reduce((s,v)=> s + (Number(v.cantidad)||0) * (Number(v.precio_unitario)||0), 0);
+  document.getElementById('ventasHistTotal').textContent = filtradas.length;
+  document.getElementById('ventasHistUnidades').textContent = totalUnidades;
+  document.getElementById('ventasHistIngresos').textContent = fmtUsd(totalIngresos);
+
+  if(!filtradas.length){
+    cont.innerHTML = '<div class="sin-datos">No has registrado ventas todavía.</div>';
+    btnMas.classList.add('oculto');
+    return;
+  }
+
+  const visibles = filtradas.slice(0, ventasHistVisibles);
+  cont.innerHTML = `
+    <table class="tabla-ventas">
+      <thead><tr><th>Fecha</th><th>Producto</th><th>Cantidad</th><th>Precio unit.</th><th>Total</th></tr></thead>
+      <tbody>
+        ${visibles.map(v => {
+          const nombre = v.productos_servicios ? v.productos_servicios.nombre : (v.producto_id||'—');
+          const fecha = new Date(v.fecha_venta).toLocaleDateString('es-VE', {day:'2-digit', month:'short', year:'numeric'});
+          const total = (Number(v.cantidad)||0) * (Number(v.precio_unitario)||0);
+          return `<tr>
+            <td data-etq="Fecha">${fecha}</td>
+            <td data-etq="Producto">${nombre}</td>
+            <td data-etq="Cantidad">${v.cantidad}</td>
+            <td data-etq="Precio unit.">${fmtUsd(v.precio_unitario)}</td>
+            <td data-etq="Total">${fmtUsd(total)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+  btnMas.classList.toggle('oculto', filtradas.length <= ventasHistVisibles);
+}
+function exportarVentasCSV(){
+  const q = (document.getElementById('buscarVentasHist')?.value||'').trim().toLowerCase();
+  const filtradas = ventasHistCache.filter(v => {
+    const nombre = v.productos_servicios ? v.productos_servicios.nombre : (v.producto_id||'');
+    return !q || nombre.toLowerCase().includes(q);
+  });
+  const filas = filtradas.map(v => {
+    const nombre = v.productos_servicios ? v.productos_servicios.nombre : (v.producto_id||'');
+    const total = (Number(v.cantidad)||0) * (Number(v.precio_unitario)||0);
+    return [ new Date(v.fecha_venta).toISOString().slice(0,10), nombre, v.cantidad, v.precio_unitario, total.toFixed(2) ];
+  });
+  exportarCSV('mis-ventas.csv', ['Fecha','Producto','Cantidad','Precio unitario','Total'], filas);
+}
+
 /* ---------- Gráfico de ventas de reventa ---------- */
 async function cargarVentasChart(){
   const desde = new Date(); desde.setDate(desde.getDate() - 30);
@@ -797,12 +1005,13 @@ async function cargarVentasChart(){
 }
 
 /* ---------- Referidos ---------- */
+let referidosCache = [];
+let referidosVisibles = 12;
 async function cargarReferidos(){
   const { data, error } = await sb.rpc('obtener_referidos_recientes');
-  const cont = document.getElementById('listaReferidos');
 
   if(error || !data){
-    cont.innerHTML = '<div class="sin-datos">No se pudieron cargar tus referidos.</div>';
+    document.getElementById('listaReferidos').innerHTML = '<div class="sin-datos">No se pudieron cargar tus referidos.</div>';
     pintarChartReferidos([]);
     document.getElementById('kpiRefCompras').textContent = '0';
     document.getElementById('kpiRefGenerado').textContent = fmtUsd(0);
@@ -810,14 +1019,51 @@ async function cargarReferidos(){
     return;
   }
 
-  if(data.length === 0){
-    cont.innerHTML = '<div class="sin-datos">Cuando alguien compre con tu código directo a la empresa, lo verás aquí.</div>';
-  } else {
-    cont.innerHTML = `
+  referidosCache = data;
+  referidosVisibles = 12;
+
+  const totalCompras = data.length;
+  const totalGenerado = data.reduce((s,r)=> s + (Number(r.monto_comision)||0), 0);
+  const totalPendiente = data.filter(r => !(r.estado_comision||'').toLowerCase().includes('pag'))
+                             .reduce((s,r)=> s + (Number(r.monto_comision)||0), 0);
+  document.getElementById('kpiRefCompras').textContent = totalCompras;
+  document.getElementById('kpiRefGenerado').textContent = fmtUsd(totalGenerado);
+  document.getElementById('kpiRefPendiente').textContent = fmtUsd(totalPendiente);
+
+  pintarChartReferidos(data);
+  renderReferidos();
+}
+function filtrarReferidos(){
+  referidosVisibles = 12;
+  renderReferidos();
+}
+function verMasReferidos(){
+  referidosVisibles += 12;
+  renderReferidos();
+}
+function renderReferidos(){
+  const cont = document.getElementById('listaReferidos');
+  const btnMas = document.getElementById('btnVerMasReferidos');
+  const q = (document.getElementById('buscarReferidos')?.value||'').trim().toLowerCase();
+
+  const filtrados = referidosCache.filter(r =>
+    !q || (r.cliente_nombre||'').toLowerCase().includes(q) || (r.producto_nombre||'').toLowerCase().includes(q)
+  );
+
+  if(!filtrados.length){
+    cont.innerHTML = referidosCache.length
+      ? '<div class="sin-datos">Ningún referido coincide con esa búsqueda.</div>'
+      : '<div class="sin-datos">Cuando alguien compre con tu código directo a la empresa, lo verás aquí.</div>';
+    btnMas.classList.add('oculto');
+    return;
+  }
+
+  const visibles = filtrados.slice(0, referidosVisibles);
+  cont.innerHTML = `
     <table class="tabla-referidos">
       <thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Nivel</th><th>Comisión</th><th>Estado</th></tr></thead>
       <tbody>
-        ${data.slice(0,12).map(r=>{
+        ${visibles.map(r=>{
           const fecha = new Date(r.fecha).toLocaleDateString('es-VE', {day:'2-digit', month:'short'});
           const estadoClase = (r.estado_comision||'').toLowerCase().includes('pag') ? 'pagada' : 'pendiente';
           return `<tr>
@@ -831,17 +1077,18 @@ async function cargarReferidos(){
         }).join('')}
       </tbody>
     </table>`;
-  }
-
-  const totalCompras = data.length;
-  const totalGenerado = data.reduce((s,r)=> s + (Number(r.monto_comision)||0), 0);
-  const totalPendiente = data.filter(r => !(r.estado_comision||'').toLowerCase().includes('pag'))
-                             .reduce((s,r)=> s + (Number(r.monto_comision)||0), 0);
-  document.getElementById('kpiRefCompras').textContent = totalCompras;
-  document.getElementById('kpiRefGenerado').textContent = fmtUsd(totalGenerado);
-  document.getElementById('kpiRefPendiente').textContent = fmtUsd(totalPendiente);
-
-  pintarChartReferidos(data);
+  btnMas.classList.toggle('oculto', filtrados.length <= referidosVisibles);
+}
+function exportarReferidosCSV(){
+  const q = (document.getElementById('buscarReferidos')?.value||'').trim().toLowerCase();
+  const filtrados = referidosCache.filter(r =>
+    !q || (r.cliente_nombre||'').toLowerCase().includes(q) || (r.producto_nombre||'').toLowerCase().includes(q)
+  );
+  const filas = filtrados.map(r => [
+    new Date(r.fecha).toISOString().slice(0,10), r.cliente_nombre, r.producto_nombre||'', 'N'+r.nivel,
+    r.monto_comision, r.estado_comision||''
+  ]);
+  exportarCSV('mis-referidos.csv', ['Fecha','Cliente','Producto','Nivel','Comisión','Estado'], filas);
 }
 
 function pintarChartReferidos(data){
